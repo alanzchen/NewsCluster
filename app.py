@@ -10,6 +10,14 @@ api = Api(app)
 NEWS_list = {i.rstrip('.json').lstrip('static/'): NewsCluster(id=i.rstrip('.json'), data=json.load(open(i, 'r')))
              for i in glob.glob('static/*.json')}
 
+def get_new_id():
+    new_id = 0
+    for key in NEWS_list.keys():
+        if int(key) > new_id:
+            new_id = int(key)
+    new_id += 1
+    return new_id
+
 def abort_if_doesnt_exist(news_id):
     if news_id not in NEWS_list:
         abort(404, message="{} doesn't exist".format(news_id))
@@ -74,7 +82,7 @@ class NewsList(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('title', type=str, help='Title of the news')
         args = parser.parse_args()
-        id_ = int(max(NEWS_list.keys(), default=0)) + 1
+        id_ = get_new_id()
         n = NewsCluster(id_, title=args['title'])
         NEWS_list[str(id_)] = n
         return str(id_), 201
