@@ -3,12 +3,17 @@ from flask_restful import reqparse, abort, Api, Resource
 import json
 import glob
 from NewsCluster import NewsCluster
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 api = Api(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+db = SQLAlchemy(app)
 
 NEWS_list = {i.rstrip('.json').lstrip('static/'): NewsCluster(id=i.rstrip('.json'), data=json.load(open(i, 'r')))
              for i in glob.glob('static/*.json')}
+
+import models
 
 def get_new_id():
     new_id = 0
