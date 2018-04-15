@@ -42,7 +42,7 @@ class Word(db.Model):
     __tablename__ = 'word'
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
-    frequency = db.Column(db.Integer, nullable=False)
+    frequency = db.Column(db.Float, nullable=False)
     news_id = db.Column(db.Integer, db.ForeignKey('news.id'))
 
     def __repr__(self):
