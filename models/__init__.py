@@ -5,9 +5,10 @@ import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, Float, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 
 engine = create_engine(os.environ['DATABASE_URL'], echo=True)
+SessionMaker = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
@@ -47,6 +48,9 @@ class Word(Base):
     def __repr__(self):
         return '<Word %r>' % self.content
 
+
+def get_session():
+    return SessionMaker()
 
 def create_all():
     Base.metadata.create_all(engine)

@@ -5,6 +5,8 @@ import time
 from protos import NewsCluster_pb2
 from protos import NewsCluster_pb2_grpc
 
+from models import get_session, News, Document
+
 from NewsCluster import NewsCluster
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
@@ -119,12 +121,39 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
 
     def __success(self):
         return NewsCluster_pb2.Result(type=NewsCluster_pb2.Result.Success)
+    
+    def __failure(self, message: str):
+        return NewsCluster_pb2.Result(
+            type=NewsCluster_pb2.Result.Failure,
+            message=message
+        )
 
     def CreateNews(self, request, context):
-        return self.__success()
+        try:
+            session = get_session()
+            session.add(News(id=request.id))
+            session.commit()
+            return self.__success()
+        except Exception as e:
+            print(e)
+            return self.__failure(str(e))
 
     def AddDocument(self, request, context):
-        return self.__success()
+        try:
+            session = get_session()
+            session.add(
+                Document(
+                    id=request.id,
+                    title=request.title,
+                    url=request.url,
+                    content=request.content,
+                    news_id=request.news_id
+                ))
+            session.commit()
+            return self.__success()
+        except Exception as e:
+            print(e)
+            return self.__failure(str(e))
 
     def GetDocumentById(self, request, context):
         return NewsCluster_pb2.Result()

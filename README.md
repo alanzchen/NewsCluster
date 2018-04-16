@@ -13,7 +13,7 @@ pip install -r requirements.txt
 **Please set the environment variable `SQLALCHEMY_DATABASE_URI` before you run the service**
 
 ```
-python app.py
+make
 ```
 
 ## Usage
