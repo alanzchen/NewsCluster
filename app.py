@@ -38,7 +38,6 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
                     session.add(
                         Document(
                             id=request.id,
-                            title=request.title,
                             url=request.url,
                             news_id=request.news_id
                         ))
@@ -58,11 +57,7 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
             with get_session() as session:
                 result = session.query(Document)\
                     .filter(Document.id == request.id)
-                if (len(result) == 0):
-                    context.set_code(grpc.StatusCode.NOT_FOUND)
-                    context.set_details('Document is not found')
-                else:
-                    doc = result[0]
+                for doc in result:
                     return NewsCluster_pb2.Document(
                         id = doc.id,
                         title = doc.title,
@@ -70,6 +65,8 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
                         mercury_data = json.dumps(doc.mercury_data),
                         news_id = doc.news_id
                     )
+                context.set_code(grpc.StatusCode.NOT_FOUND)
+                context.set_details('Document is not found')
 
 
 def serve():

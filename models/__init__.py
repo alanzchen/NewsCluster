@@ -33,6 +33,6 @@ def create_all():
 def clear_all_data():
     print("Clearing all data...")
     with get_session() as session:
-        session.query(News).delete()
-        session.query(Document).delete()
         session.query(Word).delete()
+        session.query(Document).delete()
+        session.query(News).delete()
