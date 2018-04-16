@@ -1,17 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from app import db
 
-class NewsCluster(db.Model):
-    __tablename__ = 'cluster' 
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, unique=True, nullable=False)
-    news = db.relationship('News', backref='cluster',
-                                lazy='dynamic')
-
-    def __repr__(self):
-        return '<Cluster %r>' % self.title
-
-
 class News(db.Model):
     __tablename__ = 'news'
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +19,8 @@ class Document(db.Model):
     __tablename__ = 'document'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text, nullable=True)
-    content = db.Column(db.Text, nullable=False)
+    url = db.Column(db.Text, nullable=True)
+    content = db.Column(db.Text, nullable=True)
     news_id = db.Column(db.Integer, db.ForeignKey('news.id'))
 
     def __repr__(self):

@@ -38,6 +38,7 @@ class News(Resource):
         :param news_id: the ID of the news cluster.
         :return: a JSON representation of the news cluster.
         """
+        user = models.News.query.filter_by(username=username).first_or_404()
         abort_if_doesnt_exist(str(news_id))
         return jsonify(NEWS_list[str(news_id)].data)
 
