@@ -16,7 +16,6 @@ class News(Base):
     __tablename__ = 'news'
     id = Column(Integer, primary_key=True)
     title = Column(Text, nullable=True)
-    cluster_id = Column(Integer, ForeignKey('cluster.id'))
     docs = relationship('Document', backref='news',
                                 lazy='dynamic')
     words = relationship('Word', backref='news',
@@ -54,3 +53,11 @@ def get_session():
 
 def create_all():
     Base.metadata.create_all(engine)
+
+def clear_all_data():
+    print("Clearing all data...")
+    session = get_session()
+    session.query(News).delete()
+    session.query(Document).delete()
+    session.query(Word).delete()
+    session.commit()

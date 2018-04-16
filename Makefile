@@ -8,3 +8,6 @@ create-all:
 
 create-proto:
 	$(PYTHON) -m grpc_tools.protoc -I./v2land-grpc --python_out=. --grpc_python_out=. ./v2land-grpc/protos/*.proto
+
+test:
+	$(PYTHON) runTest.py

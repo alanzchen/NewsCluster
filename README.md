@@ -16,6 +16,12 @@ pip install -r requirements.txt
 make
 ```
 
+## Running the tests
+
+```
+make test
+```
+
 ## Usage
 
 See ``tests/``.
