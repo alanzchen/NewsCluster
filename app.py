@@ -1,4 +1,5 @@
 from concurrent import futures
+from functools import partial
 import grpc
 import time
 import json
@@ -8,6 +9,7 @@ from protos import NewsCluster_pb2_grpc
 
 from models import get_session, News, Document
 from utils import default_error
+from NewsCluster import extractContentToDatabase
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -38,9 +40,15 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
                             id=request.id,
                             title=request.title,
                             url=request.url,
-                            content=request.content,
                             news_id=request.news_id
                         ))
+                    context.add_callback(
+                        partial(
+                            extractContentToDatabase,
+                            request.news_id,
+                            request.url
+                        )
+                    )
                     return self.__createResult(True)
                 else:
                     return self.__createResult(False)

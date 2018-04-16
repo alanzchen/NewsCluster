@@ -1,7 +1,9 @@
 import os
 import requests
 
-MERCURY_TOKEN = os.environ['MERCURY_TOKEN']
+from models import get_session, Document
+
+MERCURY_TOKEN = os.environ['MERCURY_KEY']
 MERCURY_URL = 'https://mercury.postlight.com/parser?url='
 
 def extractContentFromUrl(url: str):
@@ -28,6 +30,10 @@ def extractContentFromUrl(url: str):
     r = requests.get(MERCURY_URL + url, headers=headers)
     return r.json()
 
-def extractContentToDataBase(newsId: int, url: str):
+def extractContentToDatabase(newsId: int, url: str):
     data = extractContentFromUrl(url)
-    pass
+    with get_session() as session:
+        for doc in session.query(Document)\
+            .filter(Document.id == newsId):
+            doc.mercury_data = data
+        session.commit()
