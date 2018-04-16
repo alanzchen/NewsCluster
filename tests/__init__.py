@@ -8,4 +8,4 @@ def run(uri: str):
     channel = grpc.insecure_channel(uri)
     stub = NewsCluster_pb2_grpc.NewsServiceStub(channel)
     response = stub.CreateNews(NewsCluster_pb2.CreateNewsRequest(id=0))
-    print("Greeter client received: " + str(response.type))
+    print("Client received.")

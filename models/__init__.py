@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 
 import os
+from contextlib import contextmanager
 import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, Float, Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -48,16 +49,22 @@ class Word(Base):
         return '<Word %r>' % self.content
 
 
+@contextmanager
 def get_session():
-    return SessionMaker()
+    session = SessionMaker()
+    try:
+        yield session
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise e
 
 def create_all():
     Base.metadata.create_all(engine)
 
 def clear_all_data():
     print("Clearing all data...")
-    session = get_session()
-    session.query(News).delete()
-    session.query(Document).delete()
-    session.query(Word).delete()
-    session.commit()
+    with get_session() as session:
+        session.query(News).delete()
+        session.query(Document).delete()
+        session.query(Word).delete()
