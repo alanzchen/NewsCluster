@@ -117,7 +117,16 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
 
+    def __success(self):
+        return NewsCluster_pb2.Result(type=NewsCluster_pb2.Result.Success)
+
     def CreateNews(self, request, context):
+        return self.__success()
+
+    def AddDocument(self, request, context):
+        return self.__success()
+
+    def GetDocumentById(self, request, context):
         return NewsCluster_pb2.Result()
 
 

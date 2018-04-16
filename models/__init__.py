@@ -1,38 +1,52 @@
 from flask_sqlalchemy import SQLAlchemy
-from app import db
 
-class News(db.Model):
+import os
+import sqlalchemy
+from sqlalchemy import create_engine, Column, Integer, Float, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
+
+engine = create_engine(os.environ['DATABASE_URL'], echo=True)
+
+Base = declarative_base()
+
+class News(Base):
     __tablename__ = 'news'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=True)
-    cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id'))
-    docs = db.relationship('Document', backref='news',
+    id = Column(Integer, primary_key=True)
+    title = Column(Text, nullable=True)
+    cluster_id = Column(Integer, ForeignKey('cluster.id'))
+    docs = relationship('Document', backref='news',
                                 lazy='dynamic')
-    words = db.relationship('Word', backref='news',
+    words = relationship('Word', backref='news',
                                 lazy='dynamic')
 
     def __repr__(self):
         return '<News %r>' % self.title
 
 
-class Document(db.Model):
+class Document(Base):
     __tablename__ = 'document'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=True)
-    url = db.Column(db.Text, nullable=True)
-    content = db.Column(db.Text, nullable=True)
-    news_id = db.Column(db.Integer, db.ForeignKey('news.id'))
+    id = Column(Integer, primary_key=True)
+    title = Column(Text, nullable=True)
+    url = Column(Text, nullable=True)
+    content = Column(Text, nullable=True)
+    news_id = Column(Integer, ForeignKey('news.id'))
 
     def __repr__(self):
         return '<Document %r>' % self.title
 
 
-class Word(db.Model):
+class Word(Base):
     __tablename__ = 'word'
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text, nullable=False)
-    frequency = db.Column(db.Float, nullable=False)
-    news_id = db.Column(db.Integer, db.ForeignKey('news.id'))
+    id = Column(Integer, primary_key=True)
+    content = Column(Text, nullable=False)
+    frequency = Column(Float, nullable=False)
+    news_id = Column(Integer, ForeignKey('news.id'))
 
     def __repr__(self):
         return '<Word %r>' % self.content
+
+
+def create_all():
+    Base.metadata.create_all(engine)
