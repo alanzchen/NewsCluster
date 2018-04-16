@@ -3,50 +3,18 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from contextlib import contextmanager
 import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, Float, Text
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(os.environ['DATABASE_URL'], echo=True)
 SessionMaker = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
-class News(Base):
-    __tablename__ = 'news'
-    id = Column(Integer, primary_key=True)
-    title = Column(Text, nullable=True)
-    docs = relationship('Document', backref='news',
-                                lazy='dynamic')
-    words = relationship('Word', backref='news',
-                                lazy='dynamic')
-
-    def __repr__(self):
-        return '<News %r>' % self.title
-
-
-class Document(Base):
-    __tablename__ = 'document'
-    id = Column(Integer, primary_key=True)
-    title = Column(Text, nullable=True)
-    url = Column(Text, nullable=True)
-    content = Column(Text, nullable=True)
-    news_id = Column(Integer, ForeignKey('news.id'))
-
-    def __repr__(self):
-        return '<Document %r>' % self.title
-
-
-class Word(Base):
-    __tablename__ = 'word'
-    id = Column(Integer, primary_key=True)
-    content = Column(Text, nullable=False)
-    frequency = Column(Float, nullable=False)
-    news_id = Column(Integer, ForeignKey('news.id'))
-
-    def __repr__(self):
-        return '<Word %r>' % self.content
+from models.news import News
+from models.document import Document
+from models.word import Word
 
 
 @contextmanager
