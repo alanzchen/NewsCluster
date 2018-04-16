@@ -15,8 +15,7 @@ class NewsCluster(db.Model):
 class News(db.Model):
     __tablename__ = 'news'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=False)
-    docs = db.Column(db.Text, nullable=False)
+    title = db.Column(db.Text, nullable=True)
     cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id'))
     docs = db.relationship('Document', backref='news',
                                 lazy='dynamic')
@@ -30,7 +29,7 @@ class News(db.Model):
 class Document(db.Model):
     __tablename__ = 'document'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=False)
+    title = db.Column(db.Text, nullable=True)
     content = db.Column(db.Text, nullable=False)
     news_id = db.Column(db.Integer, db.ForeignKey('news.id'))
 
