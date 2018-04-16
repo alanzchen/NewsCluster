@@ -120,30 +120,55 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
 
-    def __empty(self):
-        return NewsCluster_pb2.Empty()
+    def __createResult(self, value):
+        return NewsCluster_pb2.CreateResult(created=value)
 
-    def CreateNews(self, request, context):
+    def CreateNewsIfNotExists(self, request, context):
         with default_error(context):
             with get_session() as session:
-                session.add(News(id=request.id))
-            return self.__empty()
+                count = session.query(News)\
+                    .filter(News.id == request.id).count()
+                if count == 0:
+                    session.add(News(id=request.id))
+                    return self.__createResult(True)
+                else:
+                    return self.__createResult(False)
 
-    def AddDocument(self, request, context):
+    def AddDocumentIfNotExists(self, request, context):
         with default_error(context):
             with get_session() as session:
-                session.add(
-                    Document(
-                        id=request.id,
-                        title=request.title,
-                        url=request.url,
-                        content=request.content,
-                        news_id=request.news_id
-                    ))
-            return self.__empty()
+                count = session.query(Document)\
+                    .filter(Document.id == request.id).count()
+                if count == 0:
+                    session.add(
+                        Document(
+                            id=request.id,
+                            title=request.title,
+                            url=request.url,
+                            content=request.content,
+                            news_id=request.news_id
+                        ))
+                    return self.__createResult(True)
+                else:
+                    return self.__createResult(False)
 
     def GetDocumentById(self, request, context):
-        return self.__empty()
+        with default_error(context):
+            with get_session() as session:
+                result = session.query(Document)\
+                    .filter(Document.id == request.id)
+                if (len(result) == 0):
+                    context.set_code(grpc.StatusCode.NOT_FOUND)
+                    context.set_details('Document is not found')
+                else:
+                    doc = result[0]
+                    return NewsCluster_pb2.Document(
+                        id = doc.id,
+                        title = doc.title,
+                        url = doc.url,
+                        content = doc.content,
+                        news_id = doc.news_id
+                    )
 
 
 def serve():
