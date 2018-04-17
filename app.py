@@ -7,7 +7,7 @@ import json
 from protos import NewsCluster_pb2
 from protos import NewsCluster_pb2_grpc
 
-from models import get_session, News, Document
+from models import create_all, get_session, News, Document
 from utils import default_error
 from NewsCluster import extractContentToDatabase
 
@@ -81,4 +81,5 @@ def serve():
         server.stop(0)
 
 if __name__ == '__main__':
+    create_all()
     serve()
