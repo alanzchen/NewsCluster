@@ -1,5 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
-
 import os
 from contextlib import contextmanager
 import sqlalchemy
