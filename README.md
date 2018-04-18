@@ -1,5 +1,11 @@
 # News Cluster Service
 
+## Clone
+
+```
+git clone --recursive https://github.com/alanzchen/NewsCluster.git
+```
+
 ## Installation
 
 First install the dependencies:
