@@ -7,9 +7,9 @@ from protos import NewsCluster_pb2, NewsCluster_pb2_grpc
 
 def testNews(stub):
     response = stub.CreateNewsIfNotExists(NewsCluster_pb2.CreateNewsRequest(id=0))
+    assert response.created == True
+    response = stub.CreateNewsIfNotExists(NewsCluster_pb2.CreateNewsRequest(id=0))
     assert response.created == False
-    # response = stub.CreateNewsIfNotExists(NewsCluster_pb2.CreateNewsRequest(id=0))
-    # assert response.created == False
 
 
 def testDocument(stub):
@@ -17,7 +17,7 @@ def testDocument(stub):
         NewsCluster_pb2.AddDocumentRequest(
             id = 0,
             url = 'http://www.kanfanews.com/pc/index/article/1005035',
-            news_id = 0
+            newsId = 0
         )
     )
     assert response.created == True
@@ -26,7 +26,7 @@ def testDocument(stub):
         doc = stub.GetDocumentById(
             NewsCluster_pb2.GetDocumentByIdRequest(id=0)
         )
-        if (doc.mercury_data != None):
+        if (doc.mercuryData != None):
             flag = True
             break
         print(str(i) + " failed, retrying...")
@@ -38,5 +38,7 @@ def testDocument(stub):
 def run(uri: str):
     channel = grpc.insecure_channel(uri)
     stub = NewsCluster_pb2_grpc.NewsServiceStub(channel)
+    pong = stub.PingPong(NewsCluster_pb2.Ping(message="Hello"))
+    print(pong.message)
     testNews(stub)
-    # testDocument(stub)
+    testDocument(stub)
