@@ -35,10 +35,14 @@ def testDocument(stub):
         raise Exception("Fetch mercury api failed")
 
 
+def testPingPong(stub):
+    pong = stub.PingPong(NewsCluster_pb2.Ping(message="Hello"))
+    print(pong.message)
+    print(pong.serverTime)
+
 def run(uri: str):
     channel = grpc.insecure_channel(uri)
     stub = NewsCluster_pb2_grpc.NewsServiceStub(channel)
-    pong = stub.PingPong(NewsCluster_pb2.Ping(message="Hello"))
-    print(pong.message)
+    testPingPong(stub)
     testNews(stub)
     testDocument(stub)
