@@ -2,6 +2,7 @@ from concurrent import futures
 from functools import partial
 import grpc
 import time
+import datetime
 import json
 
 from protos import NewsCluster_pb2
@@ -17,6 +18,12 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
 
     def __createResult(self, value):
         return NewsCluster_pb2.CreateResult(created=value)
+
+    def PingPong(self, request, context):
+        return NewsCluster_pb2.Pong(
+            message=request.message,
+            serverTime=str(datetime.datetime.now())
+        )
 
     def CreateNewsIfNotExists(self, request, context):
         with default_error(context):
@@ -39,12 +46,12 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
                         Document(
                             id=request.id,
                             url=request.url,
-                            news_id=request.news_id
+                            news_id=request.newsId
                         ))
                     context.add_callback(
                         partial(
                             extractContentToDatabase,
-                            request.news_id,
+                            request.newsId,
                             request.url
                         )
                     )
@@ -62,8 +69,8 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
                         id = doc.id,
                         title = doc.title,
                         url = doc.url,
-                        mercury_data = json.dumps(doc.mercury_data),
-                        news_id = doc.news_id
+                        mercuryData = json.dumps(doc.mercury_data),
+                        newsId = doc.news_id
                     )
                 context.set_code(grpc.StatusCode.NOT_FOUND)
                 context.set_details('Document is not found')
