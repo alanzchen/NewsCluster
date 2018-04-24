@@ -12,7 +12,6 @@ Base = declarative_base()
 
 from models.news import News
 from models.document import Document
-from models.word import Word
 
 
 @contextmanager
@@ -31,6 +30,5 @@ def create_all():
 def clear_all_data():
     print("Clearing all data...")
     with get_session() as session:
-        session.query(Word).delete()
         session.query(Document).delete()
         session.query(News).delete()

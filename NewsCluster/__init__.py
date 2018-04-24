@@ -1,5 +1,7 @@
 import os
 import requests
+from lxml.html.clean import Cleaner
+import jieba.analyse
 
 from models import get_session, Document
 
@@ -30,10 +32,44 @@ def extractContentFromUrl(url: str):
     r = requests.get(MERCURY_URL + url, headers=headers)
     return r.json()
 
+
+# https://stackoverflow.com/questions/3073881/clean-up-html-in-python
+def sanitize(dirty_html):
+    cleaner = Cleaner(page_structure=True,
+                  meta=True,
+                  embedded=True,
+                  links=True,
+                  style=True,
+                  processing_instructions=True,
+                  inline_style=True,
+                  scripts=True,
+                  javascript=True,
+                  comments=True,
+                  frames=True,
+                  forms=True,
+                  annoying_tags=True,
+                  remove_unknown_tags=True,
+                  safe_attrs_only=True,
+                  safe_attrs=frozenset(['src','color', 'href', 'title', 'class', 'name', 'id']),
+                  remove_tags=('span', 'font', 'div')
+                  )
+
+    return cleaner.clean_html(dirty_html)
+
+
 def extractContentToDatabase(newsId: int, url: str):
     data = extractContentFromUrl(url)
     with get_session() as session:
         for doc in session.query(Document)\
             .filter(Document.id == newsId):
             doc.mercury_data = data
-        session.commit()
+
+            docTitle = data['title']
+            dirtyContent = data['content']
+            cleanedContent = sanitize(dirtyContent)
+            doc_words = jieba.analyse.textrank(
+                docTitle + ' ' + cleanedContent,
+                topK=50,
+                withWeight=False,
+                allowPOS=('ns', 'n', 'vn', 'v')
+            )
