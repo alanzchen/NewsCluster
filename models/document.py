@@ -9,6 +9,7 @@ class Document(Base):
     title = Column(Text, nullable=True)
     url = Column(Text, nullable=True)
     mercury_data = Column(JSON, nullable=True)
+    words_data = Column(JSON, nullable=True)
     news_id = Column(Integer, ForeignKey('news.id'))
 
     def __repr__(self):
