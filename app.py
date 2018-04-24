@@ -51,8 +51,9 @@ class Service(NewsCluster_pb2_grpc.NewsServiceServicer):
                     context.add_callback(
                         partial(
                             extractContentToDatabase,
-                            request.newsId,
-                            request.url
+                            request.id,
+                            request.url,
+                            request.newsId
                         )
                     )
                     return self.__createResult(True)
